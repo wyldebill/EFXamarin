@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -19,9 +20,9 @@ namespace EFXamarin
                 db.Database.EnsureCreated();
 
                 // Insert Data
-                db.Add(new Blog() { BlogId = 1, Rating = 5, Url = "https://exrin.net" });
-                db.Add(new Blog() { BlogId = 2, Rating = 5, Url = "https://xamarinhelp.com" });
-                db.Add(new Blog() { BlogId = 3, Rating = 5, Url = "https://azuremobilehelp.com" });
+                db.Add(new Blog() { Rating = 5, Url = "https://exrin.net" });
+                db.Add(new Blog() { Rating = 5, Url = "https://xamarinhelp.com" });
+                db.Add(new Blog() {  Rating = 5, Url = "https://azuremobilehelp.com" });
                 db.SaveChanges();
 
                 // Retreive Data
@@ -52,7 +53,16 @@ namespace EFXamarin
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite($"Filename={_databasePath}");
+            //optionsBuilder.UseSqlite($"Filename={_databasePath}");
+            var connection = new SqliteConnection($"Data Source= {_databasePath}");
+            connection.Open();
+
+            var command = connection.CreateCommand();
+            command.CommandText = "PRAGMA key = 'password';";
+            command.ExecuteNonQuery();
+
+            optionsBuilder.UseSqlite(connection);
+
         }
     }
 
